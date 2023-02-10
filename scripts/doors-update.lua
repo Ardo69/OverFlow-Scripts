@@ -1,4 +1,4 @@
---this just has a good doors script and infinite yield, cry about it
+--this just has infinite yield version 5.9.3 and a good doors script together lol
 if IY_LOADED and not _G.IY_DEBUG == true then
 	-- error("Infinite Yield is already running!",0)
 	return
@@ -15,7 +15,7 @@ if not game:IsLoaded() then
 	notLoaded:Destroy()
 end
 
-ver = '5.9.1'
+currentVersion = '5.9.3'
 
 Players = game:GetService("Players")
 
@@ -207,7 +207,36 @@ Title.BorderSizePixel = 0
 Title.Size = UDim2.new(0, 250, 0, 20)
 Title.Font = Enum.Font.SourceSans
 Title.TextSize = 18
-Title.Text = "Infinite Yield FE v"..ver
+Title.Text = "Infinite Yield FE v" .. currentVersion
+
+do
+	local emoji = ({
+		["01 01"] = "🎆",
+		[(function(Year)
+			local A = math.floor(Year/100)
+			local B = math.floor((13+8*A)/25)
+			local C = (15-B+A-math.floor(A/4))%30
+			local D = (4+A-math.floor(A/4))%7
+			local E = (19*(Year%19)+C)%30
+			local F = (2*(Year%4)+4*(Year%7)+6*E+D)%7
+			local G = (22+E+F)
+			if E == 29 and F == 6 then
+				return "04 19"
+			elseif E == 28 and F == 6 then
+				return "04 18"
+			elseif 31 < G then
+				return ("04 %02d"):format(G-31)
+			end
+			return ("03 %02d"):format(G)
+		end)(tonumber(os.date"%Y"))] = "🥚",
+		["10 31"] = "🎃",
+		["12 25"] = "🎄"
+	})[os.date("%m %d")]
+	if emoji then
+		Title.Text = ("%s %s %s"):format(emoji, Title.Text, emoji)
+	end
+end
+
 Title.TextColor3 = Color3.new(1, 1, 1)
 Title.ZIndex = 10
 table.insert(shade1,Title)
@@ -1897,12 +1926,14 @@ InsertService = game:GetService("InsertService")
 ChatService = game:GetService("Chat")
 ProximityPromptService = game:GetService("ProximityPromptService")
 StatsService = game:GetService("Stats")
+MaterialService = game:GetService("MaterialService")
 
-local sethidden = sethiddenproperty or set_hidden_property or set_hidden_prop
-local gethidden = gethiddenproperty or get_hidden_property or get_hidden_prop
-local setsimulation = setsimulationradius or set_simulation_radius
-local queueteleport = (syn and syn.queue_on_teleport) or queue_on_teleport or (fluxus and fluxus.queue_on_teleport)
-local httprequest = (syn and syn.request) or (http and http.request) or http_request or (fluxus and fluxus.request) or request
+sethidden = sethiddenproperty or set_hidden_property or set_hidden_prop
+gethidden = gethiddenproperty or get_hidden_property or get_hidden_prop
+setsimulation = setsimulationradius or set_simulation_radius
+queueteleport = (syn and syn.queue_on_teleport) or queue_on_teleport or (fluxus and fluxus.queue_on_teleport)
+httprequest = (syn and syn.request) or (http and http.request) or http_request or (fluxus and fluxus.request) or request
+PlaceId, JobId = game.PlaceId, game.JobId
 
 function writefileExploit()
 	if writefile then
@@ -2748,6 +2779,7 @@ currentScroll = Color3.fromRGB(78,78,79)
 defaultsettings = {
 	prefix = ';';
 	StayOpen = false;
+	espTransparency = 0.3;
 	keepIY = true;
 	logsEnabled = false;
 	jLogsEnabled = false;
@@ -2765,8 +2797,6 @@ defaultsettings = {
 }
 
 defaults = HttpService:JSONEncode(defaultsettings)
-
-local KeepInfYield = true
 nosaves = false
 
 local loadedEventData = nil
@@ -2779,10 +2809,11 @@ function saves()
 					if json.prefix ~= nil then prefix = json.prefix else prefix = ';' end
 					if json.StayOpen ~= nil then StayOpen = json.StayOpen else StayOpen = false end
 					if json.keepIY ~= nil then KeepInfYield = json.keepIY else KeepInfYield = true end
+					if json.espTransparency ~= nil then espTransparency = json.espTransparency else espTransparency = 0.3 end
 					if json.logsEnabled ~= nil then logsEnabled = json.logsEnabled else logsEnabled = false end
 					if json.jLogsEnabled ~= nil then jLogsEnabled = json.jLogsEnabled else jLogsEnabled = false end
 					if json.aliases ~= nil then aliases = json.aliases else aliases = {} end
-					if json.binds ~= nil then binds = json.binds else binds = {} end
+					if json.binds ~= nil then binds = (json.binds or {}) else binds = {} end
 					if json.spawnCmds ~= nil then spawnCmds = json.spawnCmds end
 					if json.WayPoints ~= nil then AllWaypoints = json.WayPoints else WayPoints = {} AllWaypoints = {} end
 					if json.PluginsTable ~= nil then PluginsTable = json.PluginsTable else PluginsTable = {} end
@@ -2816,6 +2847,7 @@ function saves()
 				prefix = ';'
 				StayOpen = false
 				KeepInfYield = true
+				espTransparency = 0.3
 				logsEnabled = false
 				jLogsEnabled = false
 				aliases = {}
@@ -2906,6 +2938,7 @@ function saves()
 		prefix = ';'
 		StayOpen = false
 		KeepInfYield = true
+		espTransparency = 0.3
 		logsEnabled = false
 		jLogsEnabled = false
 		aliases = {}
@@ -2923,10 +2956,11 @@ function updatesaves()
 			prefix = prefix;
 			StayOpen = StayOpen;
 			keepIY = KeepInfYield;
+			espTransparency = espTransparency;
 			logsEnabled = logsEnabled;
 			jLogsEnabled = jLogsEnabled;
 			aliases = aliases;
-			binds = binds;
+			binds = binds or {};
 			WayPoints = AllWaypoints;
 			PluginsTable = PluginsTable;
 			currentShade1 = {currentShade1.R,currentShade1.G,currentShade1.B};
@@ -2948,10 +2982,14 @@ WayPoints = {}
 
 if #AllWaypoints > 0 then
 	for i = 1, #AllWaypoints do
-		if not AllWaypoints[i].GAME or AllWaypoints[i].GAME == game.PlaceId then
+		if not AllWaypoints[i].GAME or AllWaypoints[i].GAME == PlaceId then
 			WayPoints[#WayPoints + 1] = {NAME = AllWaypoints[i].NAME, COORD = {AllWaypoints[i].COORD[1], AllWaypoints[i].COORD[2], AllWaypoints[i].COORD[3]}, GAME = AllWaypoints[i].GAME}
 		end
 	end
+end
+
+if type(binds) ~= "table" then
+    binds = {}
 end
 
 function Time()
@@ -3763,7 +3801,7 @@ SaveChatlogs.MouseButton1Down:Connect(function()
 	if writefileExploit() then
 		if #scroll_2:GetChildren() > 0 then
 			notify("Loading",'Hold on a sec')
-			local placeName = CleanFileName(MarketplaceService:GetProductInfo(game.PlaceId).Name)
+			local placeName = CleanFileName(MarketplaceService:GetProductInfo(PlaceId).Name)
 			local writelogs = '-- Infinite Yield Chat logs for "'..placeName..'"\n'
 			for _, child in pairs(scroll_2:GetChildren()) do
 				writelogs = writelogs..'\n'..child.Text
@@ -3791,23 +3829,26 @@ end)
 task.spawn(function()
 	coroutine.resume(coroutine.create(function()
 		local ChatEvents = ReplicatedStorage:WaitForChild("DefaultChatSystemChatEvents", math.huge)
-		local OnMessageEvent = ChatEvents:WaitForChild("OnMessageDoneFiltering", math.huge).OnClientEvent:Connect(function(data)
-			if data ~= nil then
-				local player = tostring(data.FromSpeaker)
-				local message = tostring(data.Message)
-				local originalchannel = tostring(data.OriginalChannel)
-				if string.find(originalchannel, "To ") then
-					message = "/w " .. string.gsub(originalchannel, "To ", "") .. " " .. message
-				end
-				if originalchannel == "Team" then
-					message = "/team " .. message
-				end
-				eventEditor.FireEvent(player, message)
-				if logsEnabled then
-					CreateLabel(player, message)
-				end
-			end
-		end)
+		local OnMessageEvent = ChatEvents:WaitForChild("OnMessageDoneFiltering", math.huge)
+        if OnMessageEvent:IsA("RemoteEvent") then
+            OnMessageEvent.OnClientEvent:Connect(function(data)
+                if data ~= nil then
+                    local player = tostring(data.FromSpeaker)
+                    local message = tostring(data.Message)
+                    local originalchannel = tostring(data.OriginalChannel)
+                    if string.find(originalchannel, "To ") then
+                        message = "/w " .. string.gsub(originalchannel, "To ", "") .. " " .. message
+                    end
+                    if originalchannel == "Team" then
+                        message = "/team " .. message
+                    end
+                    eventEditor.FireEvent("OnChatted", player, message)
+                    if logsEnabled then
+                        CreateLabel(player, message)
+                    end
+                end
+            end)
+        end
 	end))
 end)
 
@@ -4226,7 +4267,8 @@ end
 CMDs = {}
 CMDs[#CMDs + 1] = {NAME = 'discord / support / help', DESC = 'Invite to the Infinite Yield support server.'}
 CMDs[#CMDs + 1] = {NAME = 'console', DESC = 'Loads old Roblox console'}
-CMDs[#CMDs + 1] = {NAME = 'explorer / dex', DESC = 'Opens DEX explorer'}
+CMDs[#CMDs + 1] = {NAME = 'explorer / dex', DESC = 'Opens DEX by Moon'}
+CMDs[#CMDs + 1] = {NAME = 'olddex / odex', DESC = 'Opens Old DEX by Moon'}
 CMDs[#CMDs + 1] = {NAME = 'remotespy / rspy', DESC = 'Opens FrostHook Spy'}
 CMDs[#CMDs + 1] = {NAME = 'audiologger / alogger', DESC = 'Opens Edges audio logger'}
 CMDs[#CMDs + 1] = {NAME = 'serverinfo / info', DESC = 'Gives you info about the server'}
@@ -4245,8 +4287,8 @@ CMDs[#CMDs + 1] = {NAME = 'copycreatorid / copycreator', DESC = 'Copies the crea
 CMDs[#CMDs + 1] = {NAME = 'setcreatorid / setcreator', DESC = 'Sets your userid to the creators ID'}
 CMDs[#CMDs + 1] = {NAME = 'noprompts', DESC = 'Prevents the game from showing you purchase/premium prompts'}
 CMDs[#CMDs + 1] = {NAME = 'showprompts', DESC = 'Allows the game to show purchase/premium prompts again'}
-CMDs[#CMDs + 1] = {NAME = 'enable [inventory/playerlist/chat/reset/all]', DESC = 'Toggles visibility of coregui items'}
-CMDs[#CMDs + 1] = {NAME = 'disable [inventory/playerlist/chat/reset/all]', DESC = 'Toggles visibility of coregui items'}
+CMDs[#CMDs + 1] = {NAME = 'enable [inventory/playerlist/chat/reset/emotes/all]', DESC = 'Toggles visibility of coregui items'}
+CMDs[#CMDs + 1] = {NAME = 'disable [inventory/playerlist/chat/reset/emotes/all]', DESC = 'Toggles visibility of coregui items'}
 CMDs[#CMDs + 1] = {NAME = 'showguis', DESC = 'Shows any invisible GUIs'}
 CMDs[#CMDs + 1] = {NAME = 'unshowguis', DESC = 'Undoes showguis'}
 CMDs[#CMDs + 1] = {NAME = 'hideguis', DESC = 'Hides any GUIs in PlayerGui'}
@@ -4349,6 +4391,7 @@ CMDs[#CMDs + 1] = {NAME = 'nosafechat / disablesafechat', DESC = 'Disables safec
 CMDs[#CMDs + 1] = {NAME = '', DESC = ''}
 CMDs[#CMDs + 1] = {NAME = 'esp', DESC = 'View all players and their status'}
 CMDs[#CMDs + 1] = {NAME = 'noesp / unesp', DESC = 'Removes esp'}
+CMDs[#CMDs + 1] = {NAME = 'esptransparency [number]', DESC = 'Changes the transparency of esp related commands'}
 CMDs[#CMDs + 1] = {NAME = 'partesp [part name]', DESC = 'Highlights a part'}
 CMDs[#CMDs + 1] = {NAME = 'unpartesp / nopartesp [part name]', DESC = 'removes partesp'}
 CMDs[#CMDs + 1] = {NAME = 'chams', DESC = 'ESP but without text in the way'}
@@ -4402,10 +4445,10 @@ CMDs[#CMDs + 1] = {NAME = 'gotopartdelay / gotomodeldelay [num]', DESC = 'Adjust
 CMDs[#CMDs + 1] = {NAME = 'bringpart [part name] (CLIENT)', DESC = 'Moves a part or multiple parts to your character'}
 CMDs[#CMDs + 1] = {NAME = 'bringpartclass / bpc [class name] (CLIENT)', DESC = 'Moves a part or multiple parts to your character based on classname'}
 CMDs[#CMDs + 1] = {NAME = 'noclickdetectorlimits / nocdlimits', DESC = 'Sets all click detectors MaxActivationDistance to math.huge'}
-CMDs[#CMDs + 1] = {NAME = 'fireclickdetectors / firecd', DESC = 'Uses all click detectors in a game'}
-CMDs[#CMDs + 1] = {NAME = 'firetouchinterests / touchinterests', DESC = 'Uses all touchinterests in a game'}
+CMDs[#CMDs + 1] = {NAME = 'fireclickdetectors / firecd [name]', DESC = 'Uses all click detectors in a game or uses the optional name'}
+CMDs[#CMDs + 1] = {NAME = 'firetouchinterests / touchinterests [name]', DESC = 'Uses all touchinterests in a game or uses the optional name'}
 CMDs[#CMDs + 1] = {NAME = 'noproximitypromptlimits / nopplimits', DESC = 'Sets all proximity prompts MaxActivationDistance to math.huge'}
-CMDs[#CMDs + 1] = {NAME = 'fireproximityprompts / firepp', DESC = 'Uses all proximity prompts in a game'}
+CMDs[#CMDs + 1] = {NAME = 'fireproximityprompts / firepp [name]', DESC = 'Uses all proximity prompts in a game or uses the optional name'}
 CMDs[#CMDs + 1] = {NAME = 'instantproximityprompts / instantpp', DESC = 'Disable the cooldown for proximity prompts'}
 CMDs[#CMDs + 1] = {NAME = 'uninstantproximityprompts / uninstantpp', DESC = 'Undo the cooldown removal'}
 CMDs[#CMDs + 1] = {NAME = 'tpunanchored / tpua [plr]', DESC = 'Teleports unanchored parts to a player'}
@@ -4610,6 +4653,8 @@ CMDs[#CMDs + 1] = {NAME = 'notifyping / ping', DESC = 'Notify yourself your ping
 CMDs[#CMDs + 1] = {NAME = 'trip', DESC = 'Makes your character fall over'}
 CMDs[#CMDs + 1] = {NAME = 'norender', DESC = 'Disable 3d Rendering to decrease the amount of CPU the client uses'}
 CMDs[#CMDs + 1] = {NAME = 'render', DESC = 'Enable 3d Rendering'}
+CMDs[#CMDs + 1] = {NAME = 'use2022materials / 2022materials', DESC = 'Enables 2022 material textures'}
+CMDs[#CMDs + 1] = {NAME = 'unuse2022materials / un2022materials', DESC = 'Disables 2022 material textures'}
 wait()
 
 for i = 1, #CMDs do
@@ -4946,7 +4991,7 @@ function addcmdtext(text,name,desc)
 	end
 end
 
-local WTS = function(Object)
+local WorldToScreen = function(Object)
 	local ObjectVector = workspace.CurrentCamera:WorldToScreenPoint(Object.Position)
 	return Vector2.new(ObjectVector.X, ObjectVector.Y)
 end
@@ -4962,7 +5007,7 @@ local GetClosestPlayerFromCursor = function()
 		if v ~= Players.LocalPlayer and v.Character and v.Character:FindFirstChildOfClass("Humanoid") then
 			for k, x in pairs(v.Character:GetChildren()) do
 				if string.find(x.Name, "Torso") then
-					local Distance = (WTS(x) - MousePositionToVector2()).Magnitude
+					local Distance = (WorldToScreen(x) - MousePositionToVector2()).Magnitude
 					if Distance < ClosestDistance then
 						ClosestDistance = Distance
 						found = v
@@ -5179,6 +5224,18 @@ SpecialPlayerCases = {
 		local v = GetClosestPlayerFromCursor()
 		if v ~= nil then table.insert(plrs, v) end
 		return plrs
+	end,
+    ["npcs"] = function(speaker,args)
+		local returns = {}
+        for _, v in pairs(workspace:GetDescendants()) do
+            if v:IsA("Model") and getRoot(v) and v:FindFirstChildWhichIsA("Humanoid") and Players:GetPlayerFromCharacter(v) == nil then
+                local clone = Instance.new("Player")
+                clone.Name = v.Name .. " - " .. v:FindFirstChildWhichIsA("Humanoid").DisplayName
+                clone.Character = v
+                table.insert(returns, v)
+            end
+        end
+		return returns
 	end,
 }
 
@@ -5408,7 +5465,7 @@ function ESP(plr)
 					a.AlwaysOnTop = true
 					a.ZIndex = 10
 					a.Size = n.Size
-					a.Transparency = 0.3
+					a.Transparency = espTransparency
 					a.Color = plr.TeamColor
 				end
 			end
@@ -5500,7 +5557,7 @@ function CHMS(plr)
 					a.AlwaysOnTop = true
 					a.ZIndex = 10
 					a.Size = n.Size
-					a.Transparency = 0.3
+					a.Transparency = espTransparency
 					a.Color = plr.TeamColor
 				end
 			end
@@ -5561,7 +5618,7 @@ function Locate(plr)
 					a.AlwaysOnTop = true
 					a.ZIndex = 10
 					a.Size = n.Size
-					a.Transparency = 0.3
+					a.Transparency = espTransparency
 					a.Color = plr.TeamColor
 				end
 			end
@@ -5921,11 +5978,23 @@ end)
 
 local function clicktpFunc()
 	pcall(function()
-		if Players.LocalPlayer.Character:FindFirstChildOfClass('Humanoid') and Players.LocalPlayer.Character:FindFirstChildOfClass('Humanoid').SeatPart then
-			Players.LocalPlayer.Character:FindFirstChildOfClass('Humanoid').Sit = false
-			wait(.1)
+		local character = Players.LocalPlayer.Character
+		local humanoid = character:FindFirstChildOfClass("Humanoid")
+		if humanoid and humanoid.SeatPart then
+			humanoid.Sit = false
+			wait(0.1)
 		end
-		getRoot(Players.LocalPlayer.Character).CFrame = IYMouse.Hit + Vector3.new(0,7,0)
+		
+		local hipHeight = humanoid and humanoid.HipHeight > 0 and (humanoid.HipHeight + 1)
+		local rootPart = getRoot(character)
+		local rootPartPosition = rootPart.Position
+		local hitPosition = IYMouse.Hit.Position
+		local newCFrame = CFrame.new(
+			hitPosition, 
+			Vector3.new(rootPartPosition.X, hitPosition.Y, rootPartPosition.Z)
+		) * CFrame.Angles(0, math.pi, 0)
+
+		rootPart.CFrame = newCFrame + Vector3.new(0, hipHeight or 4, 0)
 	end)
 end
 
@@ -6522,11 +6591,11 @@ addcmd('serverinfo',{'info','sinfo'},function(args, speaker)
 			FRAME:Destroy()
 			canOpenServerinfo = true
 		end)
-		local Asset = MarketplaceService:GetProductInfo(game.PlaceId)
+		local Asset = MarketplaceService:GetProductInfo(PlaceId)
 		SINFOGUI.name.Text = "Place Name: " .. Asset.Name
 		SINFOGUI.playerid.Text = "Player ID: " ..speaker.UserId
 		SINFOGUI.maxplayers.Text = Players.MaxPlayers.. " Players Max"
-		SINFOGUI.placeid.Text = "Place ID: " ..game.PlaceId
+		SINFOGUI.placeid.Text = "Place ID: " ..PlaceId
 
 		CopyApp.MouseButton1Click:Connect(function()
 			toClipboard(speaker.CharacterAppearanceId)
@@ -6535,7 +6604,7 @@ addcmd('serverinfo',{'info','sinfo'},function(args, speaker)
 			toClipboard(speaker.UserId)
 		end)
 		CopyPlcID.MouseButton1Click:Connect(function()
-			toClipboard(game.PlaceId)
+			toClipboard(PlaceId)
 		end)
 
 		repeat
@@ -6560,12 +6629,12 @@ addcmd('serverinfo',{'info','sinfo'},function(args, speaker)
 end)
 
 addcmd('jobid',{},function(args, speaker)
-	local jobId = 'Roblox.GameLauncher.joinGameInstance('..game.PlaceId..', "'..game.JobId..'")'
+	local jobId = 'Roblox.GameLauncher.joinGameInstance('..PlaceId..', "'..JobId..'")'
 	toClipboard(jobId)
 end)
 
 addcmd('notifyjobid',{},function(args, speaker)
-	notify('JobId / PlaceId',game.JobId..' / '..game.PlaceId)
+	notify('JobId / PlaceId',JobId..' / '..PlaceId)
 end)
 
 addcmd('breakloops',{'break'},function(args, speaker)
@@ -6580,9 +6649,9 @@ addcmd('rejoin',{'rj'},function(args, speaker)
 	if #Players:GetPlayers() <= 1 then
 		Players.LocalPlayer:Kick("\nRejoining...")
 		wait()
-		TeleportService:Teleport(game.PlaceId, Players.LocalPlayer)
+		TeleportService:Teleport(PlaceId, Players.LocalPlayer)
 	else
-		TeleportService:TeleportToPlaceInstance(game.PlaceId, game.JobId, Players.LocalPlayer)
+		TeleportService:TeleportToPlaceInstance(PlaceId, JobId, Players.LocalPlayer)
 	end
 end)
 
@@ -6595,9 +6664,9 @@ addcmd('autorejoin',{'autorj'},function(args, speaker)
 					if #Players:GetPlayers() <= 1 then
 						Players.LocalPlayer:Kick("\nRejoining...")
 						wait()
-						TeleportService:Teleport(game.PlaceId, Players.LocalPlayer)
+						TeleportService:Teleport(PlaceId, Players.LocalPlayer)
 					else
-						TeleportService:TeleportToPlaceInstance(game.PlaceId, game.JobId, Players.LocalPlayer)
+						TeleportService:TeleportToPlaceInstance(PlaceId, JobId, Players.LocalPlayer)
 					end
 				end
 			end)
@@ -6610,17 +6679,17 @@ addcmd('serverhop',{'shop'},function(args, speaker)
 	-- thanks to NoobSploit for fixing
 	if httprequest then
 		local servers = {}
-		local req = httprequest({Url = string.format("https://games.roblox.com/v1/games/%s/servers/Public?sortOrder=Asc&limit=100", game.PlaceId)})
+		local req = httprequest({Url = string.format("https://games.roblox.com/v1/games/%s/servers/Public?sortOrder=Asc&limit=100", PlaceId)})
 		local body = HttpService:JSONDecode(req.Body)
 		if body and body.data then
 			for i, v in next, body.data do
-				if type(v) == "table" and tonumber(v.playing) and tonumber(v.maxPlayers) and v.playing < v.maxPlayers and v.id ~= game.JobId then
+				if type(v) == "table" and tonumber(v.playing) and tonumber(v.maxPlayers) and v.playing < v.maxPlayers and v.id ~= JobId then
 					table.insert(servers, 1, v.id)
 				end 
 			end
 		end
 		if #servers > 0 then
-			TeleportService:TeleportToPlaceInstance(game.PlaceId, servers[math.random(1, #servers)], Players.LocalPlayer)
+			TeleportService:TeleportToPlaceInstance(PlaceId, servers[math.random(1, #servers)], Players.LocalPlayer)
 		else
 			return notify("Serverhop", "Couldn't find a server.")
 		end
@@ -6629,8 +6698,8 @@ end)
 
 addcmd('joinplayer',{'joinp'},function(args, speaker)
 	local retries = 0
-	function ToServer(User,PlaceId)	
-		if args[2] == nil then PlaceId = game.PlaceId end
+	function ToServer(User,Place)	
+		if args[2] == nil then Place = PlaceId end
 		if not pcall(function()
 				local FoundUser, UserId = pcall(function()
 					if tonumber(User) then
@@ -6643,7 +6712,7 @@ addcmd('joinplayer',{'joinp'},function(args, speaker)
 					notify('Join Error','Username/UserID does not exist')
 				else
 					notify('Join Player','Loading servers. Hold on a second.')
-					local URL2 = ("https://games.roblox.com/v1/games/"..PlaceId.."/servers/Public?sortOrder=Asc&limit=100")
+					local URL2 = ("https://games.roblox.com/v1/games/"..Place.."/servers/Public?sortOrder=Asc&limit=100")
 					local Http = HttpService:JSONDecode(game:HttpGet(URL2))
 					local GUID
 
@@ -6663,7 +6732,7 @@ addcmd('joinplayer',{'joinp'},function(args, speaker)
 
 					if GUID ~= nil then
 						notify('Join Player','Joining '..User)
-						TeleportService:TeleportToPlaceInstance(PlaceId,GUID,Players.LocalPlayer)
+						TeleportService:TeleportToPlaceInstance(Place,GUID,Players.LocalPlayer)
 					else
 						notify('Join Error','Unable to join user.')
 					end
@@ -6674,7 +6743,7 @@ addcmd('joinplayer',{'joinp'},function(args, speaker)
 				retries = retries + 1
 				print('ERROR retrying '..retries..'/3')
 				notify('Join Error','Error while trying to join. Retrying '..retries..'/3.')
-				ToServer(User,PlaceId)
+				ToServer(User,Place)
 			else
 				notify('Join Error','Error while trying to join.')
 			end
@@ -6882,6 +6951,7 @@ addcmd('cframefly', {'cfly'}, function(args, speaker)
 	speaker.Character:FindFirstChildOfClass('Humanoid').PlatformStand = true
 	local Head = speaker.Character:WaitForChild("Head")
 	Head.Anchored = true
+	if CFloop then CFloop:Disconnect() end
 	CFloop = RunService.Heartbeat:Connect(function(deltaTime)
 		local moveDirection = speaker.Character:FindFirstChildOfClass('Humanoid').MoveDirection * (CFspeed * deltaTime)
 		local headCFrame = Head.CFrame
@@ -7060,9 +7130,9 @@ addcmd('setwaypoint',{'swp','setwp','spos','saveposition','savepos'},function(ar
 	if getRoot(speaker.Character) then
 		notify('Modified Waypoints',"Created waypoint: "..getstring(1))
 		local torso = getRoot(speaker.Character)
-		WayPoints[#WayPoints + 1] = {NAME = WPName, COORD = {math.floor(torso.Position.X), math.floor(torso.Position.Y), math.floor(torso.Position.Z)}, GAME = game.PlaceId}
+		WayPoints[#WayPoints + 1] = {NAME = WPName, COORD = {math.floor(torso.Position.X), math.floor(torso.Position.Y), math.floor(torso.Position.Z)}, GAME = PlaceId}
 		if AllWaypoints ~= nil then
-			AllWaypoints[#AllWaypoints + 1] = {NAME = WPName, COORD = {math.floor(torso.Position.X), math.floor(torso.Position.Y), math.floor(torso.Position.Z)}, GAME = game.PlaceId}
+			AllWaypoints[#AllWaypoints + 1] = {NAME = WPName, COORD = {math.floor(torso.Position.X), math.floor(torso.Position.Y), math.floor(torso.Position.Z)}, GAME = PlaceId}
 		end
 	end	
 	refreshwaypoints()
@@ -7073,9 +7143,9 @@ addcmd('waypointpos',{'wpp','setwaypointposition','setpos','setwaypoint','setway
 	local WPName = tostring(getstring(1))
 	if getRoot(speaker.Character) then
 		notify('Modified Waypoints',"Created waypoint: "..getstring(1))
-		WayPoints[#WayPoints + 1] = {NAME = WPName, COORD = {args[2], args[3], args[4]}, GAME = game.PlaceId}
+		WayPoints[#WayPoints + 1] = {NAME = WPName, COORD = {args[2], args[3], args[4]}, GAME = PlaceId}
 		if AllWaypoints ~= nil then
-			AllWaypoints[#AllWaypoints + 1] = {NAME = WPName, COORD = {args[2], args[3], args[4]}, GAME = game.PlaceId}
+			AllWaypoints[#AllWaypoints + 1] = {NAME = WPName, COORD = {args[2], args[3], args[4]}, GAME = PlaceId}
 		end
 	end	
 	refreshwaypoints()
@@ -7219,7 +7289,7 @@ addcmd('deletewaypoint',{'dwp','dpos','deleteposition','deletepos'},function(arg
 	if AllWaypoints ~= nil and #AllWaypoints > 0 then
 		for i,v in pairs(AllWaypoints) do
 			if v.NAME:lower() == tostring(getstring(1)):lower() then
-				if not v.GAME or v.GAME == game.PlaceId then
+				if not v.GAME or v.GAME == PlaceId then
 					table.remove(AllWaypoints, i)
 				end
 			end
@@ -7246,19 +7316,19 @@ end)
 
 addcmd('cleargamewaypoints',{'cgamewp'},function(args, speaker)
 	for i,v in pairs(WayPoints) do
-		if v.GAME == game.PlaceId then
+		if v.GAME == PlaceId then
 			table.remove(WayPoints, i)
 		end
 	end
 	if AllWaypoints ~= nil and #AllWaypoints > 0 then
 		for i,v in pairs(AllWaypoints) do
-			if v.GAME == game.PlaceId then
+			if v.GAME == PlaceId then
 				table.remove(AllWaypoints, i)
 			end
 		end
 	end
 	for i,v in pairs(pWayPoints) do
-		if v.GAME == game.PlaceId then
+		if v.GAME == PlaceId then
 			table.remove(pWayPoints, i)
 		end
 	end
@@ -7267,33 +7337,47 @@ addcmd('cleargamewaypoints',{'cgamewp'},function(args, speaker)
 	notify('Modified Waypoints','Deleted game waypoints')
 end)
 
+
+local coreGuiTypeNames = {
+	-- predefined aliases
+	["inventory"] = Enum.CoreGuiType.Backpack,
+	["leaderboard"] = Enum.CoreGuiType.PlayerList,
+	["emotes"] = Enum.CoreGuiType.EmotesMenu
+}
+
+-- Load the full list of enums
+for _, enumItem in ipairs(Enum.CoreGuiType:GetEnumItems()) do
+	coreGuiTypeNames[enumItem.Name:lower()] = enumItem
+end
+
 addcmd('enable',{},function(args, speaker)
-	if args[1]:lower() == 'inventory' or args[1]:lower() == 'backpack' then
-		StarterGui:SetCoreGuiEnabled('Backpack', true)
-	elseif args[1]:lower() == 'playerlist' then
-		StarterGui:SetCoreGuiEnabled('PlayerList', true)
-	elseif args[1]:lower() == 'chat' then
-		StarterGui:SetCoreGuiEnabled('Chat', true)
-	elseif args[1]:lower() == 'reset' then
-		StarterGui:SetCore('ResetButtonCallback', true)
-	elseif args[1]:lower() == 'all' then
-		StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.All, true)
+	local input = args[1] and args[1]:lower()
+	if input then
+		if input == "reset" then
+			StarterGui:SetCore("ResetButtonCallback", true)
+		else
+			local coreGuiType = coreGuiTypeNames[input]
+			if coreGuiType then
+				StarterGui:SetCoreGuiEnabled(coreGuiType, true)
+			end
+		end
 	end
 end)
 
 addcmd('disable',{},function(args, speaker)
-	if args[1]:lower() == 'inventory' or args[1]:lower() == 'backpack' then
-		StarterGui:SetCoreGuiEnabled('Backpack', false)
-	elseif args[1]:lower() == 'playerlist' then
-		StarterGui:SetCoreGuiEnabled('PlayerList', false)
-	elseif args[1]:lower() == 'chat' then
-		StarterGui:SetCoreGuiEnabled('Chat', false)
-	elseif args[1]:lower() == 'reset' then
-		StarterGui:SetCore('ResetButtonCallback', false)
-	elseif args[1]:lower() == 'all' then
-		StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.All, false)
+	local input = args[1] and args[1]:lower()
+	if input then
+		if input == "reset" then
+			StarterGui:SetCore("ResetButtonCallback", false)
+		else
+			local coreGuiType = coreGuiTypeNames[input]
+			if coreGuiType then
+				StarterGui:SetCoreGuiEnabled(coreGuiType, false)
+			end
+		end
 	end
 end)
+
 
 local invisGUIS = {}
 addcmd('showguis',{},function(args, speaker)
@@ -7584,6 +7668,11 @@ addcmd('noesp',{'unesp'},function(args, speaker)
 	end
 end)
 
+addcmd('esptransparency',{},function(args, speaker)
+    espTransparency = (args[1] and isNumber(args[1]) and args[1]) or 0.3
+    updatesaves()
+end)
+
 local espParts = {}
 local partEspTrigger = nil
 function partAdded(part)
@@ -7596,7 +7685,7 @@ function partAdded(part)
 			a.AlwaysOnTop = true
 			a.ZIndex = 0
 			a.Size = part.Size
-			a.Transparency = 0.3
+			a.Transparency = espTransparency
 			a.Color = BrickColor.new("Lime green")
 		end
 	else
@@ -7618,7 +7707,7 @@ addcmd('partesp',{},function(args, speaker)
 				a.AlwaysOnTop = true
 				a.ZIndex = 0
 				a.Size = v.Size
-				a.Transparency = 0.3
+				a.Transparency = espTransparency
 				a.Color = BrickColor.new("Lime green")
 			end
 		end
@@ -8301,7 +8390,7 @@ addcmd('antiafk',{'antiidle'},function(args, speaker)
 			VirtualUser:ClickButton2(Vector2.new())
 		end)
 	end
-	notify('Anti Idle','Anti idle is enabled')
+	if not (args[1] and tostring(args[1]) == 'nonotify') then notify('Anti Idle','Anti idle is enabled') end
 end)
 
 addcmd('datalimit',{},function(args, speaker)
@@ -8454,6 +8543,21 @@ addcmd('render',{},function(args, speaker)
 	RunService:Set3dRenderingEnabled(true)
 end)
 
+addcmd('2022materials',{'use2022materials'},function(args, speaker)
+	if sethidden then
+		sethidden(MaterialService, "Use2022Materials", true)
+	else
+		notify('Incompatible Exploit','Your exploit does not support this command (missing sethiddenproperty)')
+	end
+end)
+
+addcmd('un2022materials',{'unuse2022materials'},function(args, speaker)
+	if sethidden then
+		sethidden(MaterialService, "Use2022Materials", false)
+	else
+		notify('Incompatible Exploit','Your exploit does not support this command (missing sethiddenproperty)')
+	end
+end)
 
 addcmd('goto',{'to'},function(args, speaker)
 	local players = getPlayer(args[1], speaker)
@@ -9172,7 +9276,7 @@ addcmd('nohead',{'rhead','headless'},function(args, speaker)
 		-- Full credit to Thomas_Cornez#0272 @Discord
 		local lplr = Players.LocalPlayer
 		local char = lplr.Character
-		local rig = tostring(char:FindFirstChildOfClass('Humanoid').RigType) == "Enum.HumanoidRigType.R6" and 1 or tostring(char:FindFirstChildOfClass('Humanoid').RigType) == "Enum.HumanoidRigType.R15" and 2
+		local rigType = tostring(char:FindFirstChildOfClass('Humanoid').RigType) == "Enum.HumanoidRigType.R6" and 1 or tostring(char:FindFirstChildOfClass('Humanoid').RigType) == "Enum.HumanoidRigType.R15" and 2
 
 		local speaker = Players.LocalPlayer
 
@@ -9308,7 +9412,7 @@ addcmd('unnosit',{},function(args, speaker)
 end)
 
 addcmd('jump',{},function(args, speaker)
-	speaker.Character:FindFirstChildOfClass("Humanoid").Jump = true
+	speaker.Character:FindFirstChildOfClass("Humanoid"):ChangeState(Enum.HumanoidStateType.Jumping)
 end)
 
 addcmd('infjump',{'infinitejump'},function(args, speaker)
@@ -9837,7 +9941,7 @@ addcmd('console',{},function(args, speaker)
 	-- Thanks wally!!
 	notify("Loading",'Hold on a sec')
 	local _, str = pcall(function()
-		return game:HttpGet("https://gist.githubusercontent.com/luatsuki/a1b48e02d5710ebff8fe1ffb1fc5ea38/raw/055143d9238eb6645fbb1f5c4a9a0122ca90c8f4/Console", true)
+		return game:HttpGet("https://raw.githubusercontent.com/infyiff/backup/main/console.lua", true)
 	end)
 
 	local s, e = loadstring(str)
@@ -9857,65 +9961,101 @@ addcmd('console',{},function(args, speaker)
 	notify('Console','Press F9 to open the console')
 end)
 
-addcmd('explorer',{'dex'},function(args, speaker)
-	notify("Loading",'Hold on a sec')
-	local getobjects = function(a)
-		local Objects = {}
-		if a then
-			local b = InsertService:LoadLocalAsset(a)
-			if b then 
-				table.insert(Objects, b) 
-			end
-		end
-		return Objects
-	end
+addcmd('explorer', {'dex'}, function(args, speaker)
+    notify('Loading', 'Hold on a sec')
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/peyton2465/Dex/master/out.lua"))()
+end)
 
-	local Dex = getobjects("rbxassetid://10055842438")[1]
-	Dex.Parent = PARENT
+addcmd('olddex', {'odex'}, function(args, speaker)
+    notify('Loading old explorer', 'Hold on a sec')
+    
+    local getobjects = function(a)
+        local Objects = {}
+        if a then
+            local b = InsertService:LoadLocalAsset(a)
+            if b then 
+                table.insert(Objects, b) 
+            end
+        end
+        return Objects
+    end
 
-	local function Load(Obj, Url)
-		local function GiveOwnGlobals(Func, Script)
-			local Fenv, RealFenv, FenvMt = {}, {script = Script}, {}
-			FenvMt.__index = function(a,b)
-				return RealFenv[b] == nil and getgenv()[b] or RealFenv[b]
-			end
-			FenvMt.__newindex = function(a, b, c)
-				if RealFenv[b] == nil then 
-					getgenv()[b] = c 
-				else 
-					RealFenv[b] = c 
-				end
-			end
-			setmetatable(Fenv, FenvMt)
-			pcall(setfenv, Func, Fenv)
-			return Func
-		end
+    local Dex = getobjects("rbxassetid://10055842438")[1]
+    Dex.Parent = PARENT
 
-		local function LoadScripts(_, Script)
-			if Script:IsA("LocalScript") then
-				coroutine.wrap(function()
-					GiveOwnGlobals(loadstring(Script.Source,"="..Script:GetFullName()), Script)()
-				end)()
-			end
-			table.foreach(Script:GetChildren(), LoadScripts)
-		end
+    local function Load(Obj, Url)
+        local function GiveOwnGlobals(Func, Script)
+            -- Fix for this edit of dex being poorly made
+            -- I (Alex) would like to commemorate whoever added this dex in somehow finding the worst dex to ever exist
+            local Fenv, RealFenv, FenvMt = {}, {
+                script = Script,
+                getupvalue = function(a, b)
+                    return nil -- force it to use globals
+                end,
+                getreg = function() -- It loops registry for some idiotic reason so stop it from doing that and just use a global
+                    return {} -- force it to use globals
+                end,
+                getprops = getprops or function(inst)
+                    if getproperties then
+                        local props = getproperties(inst)
+                        if props[1] and gethiddenproperty then
+                            local results = {}
+                            for _,name in pairs(props) do
+                                local success, res = pcall(gethiddenproperty, inst, name)
+                                if success then
+                                    results[name] = res
+                                end
+                            end
+                            
+                            return results
+                        end
+                        
+                        return props
+                    end
+                    
+                    return {}
+                end
+            }, {}
+            FenvMt.__index = function(a,b)
+                return RealFenv[b] == nil and getgenv()[b] or RealFenv[b]
+            end
+            FenvMt.__newindex = function(a, b, c)
+                if RealFenv[b] == nil then 
+                    getgenv()[b] = c 
+                else 
+                    RealFenv[b] = c 
+                end
+            end
+            setmetatable(Fenv, FenvMt)
+            pcall(setfenv, Func, Fenv)
+            return Func
+        end
 
-		LoadScripts(nil, Obj)
-	end
+        local function LoadScripts(_, Script)
+            if Script:IsA("LocalScript") then
+                coroutine.wrap(function()
+                    GiveOwnGlobals(loadstring(Script.Source,"="..Script:GetFullName()), Script)()
+                end)()
+            end
+            table.foreach(Script:GetChildren(), LoadScripts)
+        end
+                    
+        LoadScripts(nil, Obj)
+    end
 
-	Load(Dex)
+    Load(Dex)
 end)
 
 addcmd('remotespy',{'rspy'},function(args, speaker)
 	notify("Loading",'Hold on a sec')
 	-- Full credit to exx, creator of SimpleSpy
 	-- also thanks to NoobSploit for fixing
-	loadstring(game:HttpGet("https://gist.githubusercontent.com/Toon-arch/8f5af8403ca5dabad30763ab2b1cf8d0/raw/87d9847dd85850777e691e46d0c52f9020b42ee2/spy"))()
+	loadstring(game:HttpGet("https://raw.githubusercontent.com/infyiff/backup/main/SimpleSpyV3/main.lua"))()
 end)
 
 addcmd('audiologger',{'alogger'},function(args, speaker)
 	notify("Loading",'Hold on a sec')
-	loadstring(game:HttpGet(('https://pastebin.com/raw/GmbrsEjM'),true))()
+	loadstring(game:HttpGet(('https://raw.githubusercontent.com/infyiff/backup/main/audiologger.lua'),true))()
 end)
 
 local loopgoto = nil
@@ -10105,7 +10245,7 @@ addcmd('bang',{'rape'},function(args, speaker)
 	execCmd('unbang')
 	wait()
 	local players = getPlayer(args[1], speaker)
-	for i,v in pairs(players) do
+	for _, v in pairs(players) do
 		bangAnim = Instance.new("Animation")
 		if not r15(speaker) then
 			bangAnim.AnimationId = "rbxassetid://148840371"
@@ -10299,23 +10439,32 @@ addcmd('gotopartdelay',{},function(args, speaker)
 end)
 
 addcmd('noclickdetectorlimits',{'nocdlimits','removecdlimits'},function(args, speaker)
-	for i,v in pairs(workspace:GetDescendants()) do
+	for i,v in ipairs(workspace:GetDescendants()) do
 		if v:IsA("ClickDetector") then
 			v.MaxActivationDistance = math.huge
 		end
 	end
 end)
 
-addcmd('fireclickdetectors',{'firecd','firecds'},function(args, speaker)
-	if fireclickdetector then
-		for i,v in pairs(workspace:GetDescendants()) do
-			if v:IsA("ClickDetector") then
-				fireclickdetector(v)
-			end
-		end
-	else
-		notify('Incompatible Exploit','Your exploit does not support this command (missing fireclickdetector)')
-	end
+addcmd('fireclickdetectors',{'firecd','firecds'}, function(args, speaker)
+    if fireclickdetector then
+        if args[1] then
+            local name = getstring(1)
+            for _, descendant in ipairs(workspace:GetDescendants()) do
+                if descendant:IsA("ClickDetector") and descendant.Name == name then
+                    fireclickdetector(descendant)
+                end
+            end
+        else
+            for _, descendant in ipairs(workspace:GetDescendants()) do
+                if descendant:IsA("ClickDetector") then
+                    fireclickdetector(descendant)
+                end
+            end
+        end
+    else
+        notify("Incompatible Exploit", "Your exploit does not support this command (missing fireclickdetector)")
+    end
 end)
 
 addcmd('noproximitypromptlimits',{'nopplimits','removepplimits'},function(args, speaker)
@@ -10327,15 +10476,24 @@ addcmd('noproximitypromptlimits',{'nopplimits','removepplimits'},function(args, 
 end)
 
 addcmd('fireproximityprompts',{'firepp'},function(args, speaker)
-	if fireproximityprompt then
-		for i,v in pairs(workspace:GetDescendants()) do
-			if v:IsA("ProximityPrompt") then
-				fireproximityprompt(v)
-			end
-		end
-	else
-		notify('Incompatible Exploit','Your exploit does not support this command (missing fireproximityprompt)')
-	end
+    if fireclickdetector then
+        if args[1] then
+            local name = getstring(1)
+            for _, descendant in ipairs(workspace:GetDescendants()) do
+                if descendant:IsA("ProximityPrompt") and descendant.Name == name then
+                    fireproximityprompt(descendant)
+                end
+            end
+        else
+            for _, descendant in ipairs(workspace:GetDescendants()) do
+                if descendant:IsA("ProximityPrompt") then
+                    fireproximityprompt(descendant)
+                end
+            end
+        end
+    else
+        notify("Incompatible Exploit", "Your exploit does not support this command (missing fireproximityprompt)")
+    end
 end)
 
 local PromptButtonHoldBegan = nil
@@ -10359,30 +10517,36 @@ addcmd('uninstantproximityprompts',{'uninstantpp'},function(args, speaker)
 end)
 
 addcmd('notifyping',{'ping'},function(args, speaker)
-	local Current_Ping = string.split(StatsService.Network.ServerStatsItem["Data Ping"]:GetValueString(), " ")[1] .. "ms"
-	notify("Ping", tostring(Current_Ping))
+    notify("Ping", math.round(speaker:GetNetworkPing() * 1000) .. "ms")
 end)
 
-
 addcmd('grabtools', {}, function(args, speaker)
-	local Human = speaker.Character:FindFirstChildWhichIsA("Humanoid")
-	for _, v in ipairs(workspace:GetChildren()) do
-		if speaker.Character and v:IsA("BackpackItem") and v:FindFirstChild("Handle") then
-			Human:EquipTool(v)
+	local humanoid = speaker.Character:FindFirstChildWhichIsA("Humanoid")
+	for _, child in ipairs(workspace:GetChildren()) do
+		if speaker.Character and child:IsA("BackpackItem") and child:FindFirstChild("Handle") then
+			humanoid:EquipTool(child)
 		end
 	end
-	if grabtoolsFunc then grabtoolsFunc:Disconnect() end
-	grabtoolsFunc = workspace.ChildAdded:Connect(function(v)
-		if speaker.Character and v:IsA("BackpackItem") and v:FindFirstChild("Handle") then
-			speaker.Character:WaitForChild("Humanoid"):EquipTool(v)
+
+	if grabtoolsFunc then 
+		grabtoolsFunc:Disconnect() 
+	end
+
+	grabtoolsFunc = workspace.ChildAdded:Connect(function(child)
+		if speaker.Character and child:IsA("BackpackItem") and child:FindFirstChild("Handle") then
+			humanoid:EquipTool(child)
 		end
 	end)
-	notify('Grabtools', 'Picking up any dropped tools')
+
+	notify("Grabtools", "Picking up any dropped tools")
 end)
 
 addcmd('nograbtools',{'ungrabtools'},function(args, speaker)
-	if grabtoolsFunc then grabtoolsFunc:Disconnect() end
-	notify('Grabtools','Grabtools has been disabled')
+	if grabtoolsFunc then 
+		grabtoolsFunc:Disconnect() 
+	end
+
+	notify("Grabtools", "Grabtools has been disabled")
 end)
 
 local specifictoolremoval = {}
@@ -10566,7 +10730,7 @@ end)
 addcmd('vr',{},function(args, speaker)
 	-- Full credit to Abacaxl @V3rmillion
 	notify("Loading", "Hold on a sec")
-	loadstring(game:HttpGet("https://gist.githubusercontent.com/Toon-arch/9b118500cc792514a3048ffa723b7666/raw/bed5f399b252c75e58a9eec70634f6636ac8ac78/vr"))()
+	loadstring(game:HttpGet("https://raw.githubusercontent.com/infyiff/backup/main/vr.lua"))()
 end)
 
 addcmd('split',{},function(args, speaker)
@@ -10733,23 +10897,41 @@ addcmd('givetool', {'givetools'}, function(args, speaker)
 end)
 
 addcmd('touchinterests', {'touchinterest', 'firetouchinterests', 'firetouchinterest'}, function(args, speaker)
-	local Root = getRoot(speaker.Character) or speaker.Character:FindFirstChildWhichIsA("BasePart")
-	local function Touch(x)
-		x = x.FindFirstAncestorWhichIsA(x, "Part")
+	if not firetouchinterest then
+		notify("Incompatible Exploit", "Your exploit does not support this command (missing firetouchinterest)")
+		return
+	end
+
+	local root = getRoot(speaker.Character) or speaker.Character:FindFirstChildWhichIsA("BasePart")
+	
+	local function touch(x)
+		x = x:FindFirstAncestorWhichIsA("Part")
 		if x then
 			if firetouchinterest then
-				return task.spawn(function()
-					firetouchinterest(x, Root, 1, wait() and firetouchinterest(x, Root, 0))
+				task.spawn(function()
+					firetouchinterest(x, root, 1)
+					wait()
+					firetouchinterest(x, root, 0)
 				end)
 			end
-			x.CFrame = Root.CFrame
+			x.CFrame = root.CFrame
 		end
 	end
-	for _, v in ipairs(workspace:GetDescendants()) do
-		if v.IsA(v, "TouchTransmitter") then
-			Touch(v)
-		end
-	end
+
+    if args[1] then
+        local name = getstring(1)
+        for _, descendant in ipairs(workspace:GetDescendants()) do
+            if descendant:IsA("TouchTransmitter") and descendant.Name == name then
+                touch(descendant)
+            end
+        end
+    else
+        for _, descendant in ipairs(workspace:GetDescendants()) do
+            if descendant:IsA("TouchTransmitter") then
+                touch(descendant)
+            end
+        end
+    end
 end)
 
 addcmd('fullbright',{'fb','fullbrightness'},function(args, speaker)
@@ -11222,12 +11404,13 @@ addcmd('tpwalk', {'teleportwalk'}, function(args, speaker)
 	tpwalking = true
 	local chr = speaker.Character
 	local hum = chr and chr:FindFirstChildWhichIsA("Humanoid")
-	while tpwalking and hb:Wait() and chr and hum and hum.Parent do
+	while tpwalking and chr and hum and hum.Parent do
+		local delta = hb:Wait()
 		if hum.MoveDirection.Magnitude > 0 then
 			if args[1] and isNumber(args[1]) then
-				chr:TranslateBy(hum.MoveDirection * tonumber(args[1]))
+				chr:TranslateBy(hum.MoveDirection * tonumber(args[1]) * delta * 10)
 			else
-				chr:TranslateBy(hum.MoveDirection)
+				chr:TranslateBy(hum.MoveDirection * delta * 10)
 			end
 		end
 	end
@@ -12012,11 +12195,17 @@ end
 IYMouse.Move:Connect(checkTT)
 
 task.spawn(function()
-	if pcall(function() loadstring(game:HttpGet('https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/version'))() end) then
-		if ver ~= Version then
+	local success, latestVersionInfo = pcall(function() 
+		local versionJson = game:HttpGet('https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/version')
+		return HttpService:JSONDecode(versionJson)
+	end)
+	
+	if success then
+		if currentVersion ~= latestVersionInfo.Version then
 			notify('Outdated','Get the new version at infyiff.github.io')
 		end
-		if Announcement and Announcement ~= '' then
+		
+		if latestVersionInfo.Announcement and latestVersionInfo.Announcement ~= '' then
 			local AnnGUI = Instance.new("Frame")
 			local background = Instance.new("Frame")
 			local TextBox = Instance.new("TextLabel")
