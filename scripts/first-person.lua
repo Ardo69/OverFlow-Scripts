@@ -11,7 +11,7 @@ local player = game.Players.LocalPlayer
 local char = player.Character
 local RunService = game:GetService("RunService")
 
-char.Humanoid.CameraOffset = Vector3.new(0, 0, -1)
+--char.Humanoid.CameraOffset = Vector3.new(0, 0, -1)
 --adds the haha funny vector
 
 for i, v in pairs(char:GetChildren()) do
@@ -35,10 +35,10 @@ RunService.RenderStepped:Connect(function(step)
     local hit, pos = game.Workspace:FindPartOnRayWithIgnoreList(ray, ignoreList)
     --ignores some rays
 
-    if hit then
-        char.Humanoid.CameraOffset = Vector3.new(0, 0, -(char.Head.Position - pos).magnitude)
-    else
-        char.Humanoid.CameraOffset = Vector3.new(0, 0, -1)
-    end
+    --if hit then
+        --char.Humanoid.CameraOffset = Vector3.new(0, 0, -(char.Head.Position - pos).magnitude)
+    --else
+        --char.Humanoid.CameraOffset = Vector3.new(0, 0, -1)
+    --end
     --camera shit
 end)
