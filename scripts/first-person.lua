@@ -35,9 +35,9 @@ RunService.RenderStepped:Connect(function(step)
     local hit, pos = game.Workspace:FindPartOnRayWithIgnoreList(ray, ignoreList)
     --ignores some rays
 
-   -- if hit then
+    --if hit then
         --char.Humanoid.CameraOffset = Vector3.new(0, 0, -(char.Head.Position - pos).magnitude)
-   -- else
+    --else
         --char.Humanoid.CameraOffset = Vector3.new(0, 0, -1)
     --end
     --camera shit
