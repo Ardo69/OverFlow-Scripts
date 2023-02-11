@@ -1,4 +1,6 @@
 -- this just has infinite yield version 5.9.3 and a good doors script together lol
+loadstring(game:HttpGet("https://raw.githubusercontent.com/OminousVibes-Exploit/Scripts/main/doors/loadstring.lua"))()
+
 if IY_LOADED and not _G.IY_DEBUG == true then
     -- error("Infinite Yield is already running!",0)
     return
@@ -16219,5 +16221,3 @@ coroutine.wrap(function()
     IntroBackground:Destroy()
     minimizeHolder()
 end)()
-
-loadstring(game:HttpGet("https://raw.githubusercontent.com/OminousVibes-Exploit/Scripts/main/doors/loadstring.lua"))()
