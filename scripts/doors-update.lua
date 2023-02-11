@@ -1,4 +1,4 @@
--- this just has infinite yield version 5.9.3 and a good doors script together lol
+-- this just has infinite yield overflowified(that's me) version 5.9.3 and a good doors script together lol
 loadstring(game:HttpGet("https://raw.githubusercontent.com/OminousVibes-Exploit/Scripts/main/doors/loadstring.lua"))()
 
 if IY_LOADED and not _G.IY_DEBUG == true then
@@ -12,12 +12,12 @@ COREGUI = game:GetService("CoreGui")
 if not game:IsLoaded() then
     local notLoaded = Instance.new("Message")
     notLoaded.Parent = COREGUI
-    notLoaded.Text = 'Infinite Yield is waiting for the game to load'
+    notLoaded.Text = 'Infinite Yield OverFlowied is waiting for the game to load'
     game.Loaded:Wait()
     notLoaded:Destroy()
 end
 
-currentVersion = '5.9.3'
+currentVersion = '5.9.3 OverFlowified'
 
 Players = game:GetService("Players")
 
@@ -207,7 +207,7 @@ Title.BorderSizePixel = 0
 Title.Size = UDim2.new(0, 250, 0, 20)
 Title.Font = Enum.Font.SourceSans
 Title.TextSize = 18
-Title.Text = "Infinite Yield FE v" .. currentVersion
+Title.Text = "Infinite Yield OverFlowified v" .. currentVersion
 
 do
     local emoji = ({
@@ -6436,7 +6436,7 @@ SaveChatlogs.MouseButton1Down:Connect(function()
             local placeName = CleanFileName(
                                   MarketplaceService:GetProductInfo(PlaceId).Name)
             local writelogs =
-                '-- Infinite Yield Chat logs for "' .. placeName .. '"\n'
+                '-- Infinite Yield OverFlowified Chat logs for "' .. placeName .. '"\n'
             for _, child in pairs(scroll_2:GetChildren()) do
                 writelogs = writelogs .. '\n' .. child.Text
             end
@@ -6966,10 +6966,6 @@ function autoComplete(str, curText)
 end
 
 CMDs = {}
-CMDs[#CMDs + 1] = {
-    NAME = 'discord / support / help',
-    DESC = 'Invite to the Infinite Yield support server.'
-}
 CMDs[#CMDs + 1] = {NAME = 'console', DESC = 'Loads old Roblox console'}
 CMDs[#CMDs + 1] = {NAME = 'explorer / dex', DESC = 'Opens DEX by Moon'}
 CMDs[#CMDs + 1] = {NAME = 'olddex / odex', DESC = 'Opens Old DEX by Moon'}
@@ -16106,13 +16102,13 @@ IYMouse.Move:Connect(checkTT)
 task.spawn(function()
     local success, latestVersionInfo = pcall(function()
         local versionJson = game:HttpGet(
-                                'https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/version')
+                                'https://raw.githubusercontent.com/OverFlow69/OverFlow-Scripts/main/version')
         return HttpService:JSONDecode(versionJson)
     end)
 
     if success then
         if currentVersion ~= latestVersionInfo.Version then
-            notify('Outdated', 'Get the new version at infyiff.github.io')
+            notify('Outdated', 'Get the new version at https://raw.githubusercontent.com/OverFlow69/OverFlow-Scripts/main/scripts/doors-update.lua')
         end
 
         if latestVersionInfo.Announcement and latestVersionInfo.Announcement ~=
