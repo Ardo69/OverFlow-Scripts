@@ -52,7 +52,8 @@ do
 end
 
 normalmessage("INFO", [[Currently fixing auto a-1000 and some bugs]])
-local library = loadstring(game:HttpGet('https://raw.githubusercontent.com/OverFlow69/OverFlow-Scripts/main/scripts/doors-update-extra.lua'))()
+
+local library = loadstring(game:HttpGet('https://raw.githubusercontent.com/OverFlow69/OverFlow-Scripts/main/doors-update-extra.lua'))()
 local plr = game.Players.LocalPlayer
 local char = plr.Character or plr.CharacterAdded:Wait()
 local hum = char:FindFirstChildOfClass("Humanoid") or char:WaitForChild("Humanoid")
