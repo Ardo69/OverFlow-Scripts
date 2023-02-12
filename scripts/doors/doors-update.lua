@@ -17,7 +17,7 @@
 
 loadstring(game:HttpGet("https://raw.githubusercontent.com/OverFlow69/OverFlow-Scripts/main/scripts/inf-yield.lua"))()
 
-loadstring(game:HttpGet("https://raw.githubusercontent.com/OverFlow69/OverFlow-Scripts/main/doors-poopdors-edited.lua"))()
+loadstring(game:HttpGet("https://raw.githubusercontent.com/OverFlow69/OverFlow-Scripts/main/scripts/doors/doors-poopdors-edited.lua"))()
 
 local a=game:GetService'ReplicatedStorage'local b=
 [[https://raw.githubusercontent.com/OminousVibes-Exploit/Scripts/main/doors/]]
